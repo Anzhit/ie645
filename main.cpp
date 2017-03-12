@@ -1,15 +1,39 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-
+void mprint(vector<vector<int>> vec);
 class Node{
 public:
 	unsigned int serial; //serial no.
 	int lb;  // lower bound
-	vector<vector<int>> C; // reduced cost square matrux
-	list<pair<int,int>> in; // list of in arcs
-	list<pair<int,int>> out; // list of out arcs
-    list<list<pair<int,int>>> chains; // list of directed chains
+	vector<vector<int>> C; // reduced cost square matrix
+	vector<pair<int,int>> in; // indexed list of in arcs
+	vector<pair<int,int>> out; // indexed list of out arcs
+    vector<vector<pair<int,int>>> chains; // indexed list of directed chains
+
+    void print(){
+
+    	cout<<"Serial Number: "<<serial<<endl;
+    	cout<<"Lower Bound: "<<lb<<endl;
+    	cout<<"Residual Matrix:\n";
+    	mprint(C);
+    	cout<<"In Arcs: ";
+    	for(int i=0;i<in.size();i++)
+    		cout<<'('<<in[i].first<<','<<in[i].second<<") ";
+    	cout<<endl;
+    	cout<<"Out Arcs: ";
+    	for(int i=0;i<out.size();i++)
+    		cout<<'('<<out[i].first<<','<<out[i].second<<") ";
+    	cout<<endl;
+    	cout<<"Directed Chains: \n";
+    	for(int i=0;i<chains.size();i++){
+    		cout<<"Chain "<<i<<" :";
+    		for(int j=0;chains[i].size();j++)
+    			cout<<'('<<chains[i][j].first<<','<<chains[i][j].second<<") ";
+    		cout<<endl;
+    	}
+    	cout<<endl;
+    }
 };
 
 int reduce(vector<vector<int>> &C){
@@ -35,7 +59,7 @@ int reduce(vector<vector<int>> &C){
 
 	return ret;
 }
-void print(vector<vector<int>> vec){ //print the matrix
+void mprint(vector<vector<int>> vec){ //print the matrix
 	for (int i = 0; i < vec.size(); i++){
     	for (int j = 0; j < vec[i].size(); j++)
     	{
@@ -44,11 +68,12 @@ void print(vector<vector<int>> vec){ //print the matrix
     	cout<<endl;
     }
 }
+
 int main(){
 list<Node> nodes; // list of sorted nodes (acc LB) to be explored
 
 	vector<vector<int>> C={{1,2,3},{4,5,6},{7,8,9}};
 	cout<<reduce(C)<<endl;
-	print(C);
+	mprint(C);
 	return 0;
 }
