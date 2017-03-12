@@ -3,6 +3,7 @@
 using namespace std;
 void mprint(vector<vector<double>> vec);
 double reduce(vector<vector<double>> &C);
+int num=0;
 class Node{
 public:
 	unsigned int serial=0; //serial no.
@@ -37,8 +38,9 @@ public:
     }
     Node branch1(int I,int  J){ // branch with arc (I,J)
         Node r = *this;
-    	for(int i=0;r.C.size();i++) //SEG Fault Here
+    	for(int i=0;i<r.C.size();i++) {
     		r.C[i].erase(r.C[i].begin()+J); // remove column 
+    	}
     	r.C.erase(r.C.begin()+I); // remove row
     	r.in.push_back(make_pair(I,J));
     	//add to chain/s
@@ -78,7 +80,7 @@ public:
     		r.invalidChain(r.chains[back]);
 
     	}
-    	r.serial++;
+    	r.serial=++num;
     	r.lb+=reduce(r.C);
     	return r;
     }
@@ -87,7 +89,7 @@ public:
     	r.C[I][J]=DBL_MAX;
     	r.lb+=reduce(r.C);
     	r.out.push_back(make_pair(I,J));
-    	r.serial+=2;
+    	r.serial=++num;
     	return r;
     }
     void invalidate(int I,int J){//invalidate arc I, J i.e find element corersponding to it in matrice and set to INF
@@ -124,13 +126,14 @@ public:
     	cout<<endl;
     	cout<<"Directed Chains: \n";
     	for(int i=0;i<chains.size();i++){
-    		cout<<"Chain "<<i<<" :";
+    		cout<<"Chain "<<i+1<<" : ";
     		for ( list<int>::const_iterator j = chains[i].begin() ; j != chains[i].end() ; ++j )
-    			cout<<*j<<" ";
+    			cout<<*j<<"->";
     		cout<<endl;
     	}
     	cout<<endl;
     }
+    bool operator<(const Node& y) { return lb < y.lb; }
 };
 double reduce(vector<vector<double>> &C){
 	//reduce the cost matrix and return the obtained lower bound
@@ -164,7 +167,6 @@ void mprint(vector<vector<double>> vec){ //print the matrix
     	cout<<endl;
     }
 }
-
 int main(){
 list<Node> nodes; // list of sorted nodes (acc LB) to be explored
 	int n;
@@ -187,12 +189,17 @@ list<Node> nodes; // list of sorted nodes (acc LB) to be explored
 	init.print();
 	while(true){
 		Node cur=nodes.front();
+				nodes.pop_front();
+		cout<<"Expanding Node: "<<cur.serial<<endl;
 		pair<int,int> arc=cur.branchOn();
+		cout<<"Branching on Arc: ("<<arc.first<<","<<arc.second<<")\n";
 		Node X=cur.branch1(arc.first,arc.second);
 		X.print();
 		Node Xbar=cur.branch2(arc.first,arc.second);
 		Xbar.print();
-		break;
+		nodes.push_back(X);nodes.push_back(Xbar);
+
+		nodes.sort();
 	}
 
 	return 0;
