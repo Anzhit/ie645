@@ -4,6 +4,8 @@ using namespace std;
 void mprint(vector<vector<double>> vec);
 double reduce(vector<vector<double>> &C);
 int num=0;
+int N;
+bool done=false;
 class Node{
 public:
 	unsigned int serial=0; //serial no.
@@ -67,7 +69,10 @@ public:
     	if(front==C.size()&&back==C.size()){
     		list<int> t; t.push_back(I);t.push_back(J);
     		r.chains.push_back(t);
-    		r.invalidate(J,I);
+    		if(N==1)
+    			done=true;
+    		else
+    			r.invalidate(J,I);
     	}
     	else if(front<C.size()&&back<C.size()){
     		//connect front, back
@@ -75,15 +80,24 @@ public:
     		r.chains[back].pop_back();
     		r.chains[back].splice(r.chains[back].end(),r.chains[front]);
     		//invalidate edges
-    		r.invalidChain(r.chains[back]);
+    		if(r.chains[back].size()==N)
+    			done=true;
+    		else
+    			r.invalidChain(r.chains[back]);
     		r.chains.erase(r.chains.begin()+front);
 
     	}
     	else if(front<C.size()){
+    		if(r.chains[front].size()==N)
+    			done=true;
+    		else
     		r.invalidChain(r.chains[front]);
 
     	}
     	else if(back<C.size()){
+    		if(r.chains[back].size()==N)
+    			done=true;
+    		else
     		r.invalidChain(r.chains[back]);
 
     	}
@@ -93,7 +107,7 @@ public:
     }
     Node branch2(int I,int  J){ //branch w/o arc (I,J)
     	Node r = *this;
-    	r.invalidate(J,I);
+    	r.invalidate(I,J);
     	r.lb+=reduce(r.C);
     	r.out.push_back(make_pair(I,J));
     	r.serial=++num;
@@ -179,6 +193,7 @@ list<Node> nodes; // list of sorted nodes (acc LB) to be explored
 	int n;
 	//Take Input and create init node
 	cin>>n;
+	N=n;
 	Node init;
 	init.C.resize(n+1);
 	for(int i=0;i<=n;i++){
@@ -197,17 +212,25 @@ list<Node> nodes; // list of sorted nodes (acc LB) to be explored
 	while(true){
 		Node cur=nodes.front();
 				nodes.pop_front();
-		cout<<"Expanding Node: "<<cur.serial<<endl;
+		cout<<"Expanding Node: "<<cur.serial;
 		pair<int,int> arc=cur.branchOn();
-		cout<<"Branching on Arc: ("<<arc.first<<","<<arc.second<<")\n";
+		cout<<" Using Arc: ("<<arc.first<<","<<arc.second<<")\n";
 		Node X=cur.branch1(arc.first,arc.second);
 		X.print();
 		Node Xbar=cur.branch2(arc.first,arc.second);
 		Xbar.print();
-		if(isfinite(X.lb))
+		if(X.lb<1.7e+308){
+			cout<<"Node "<<X.serial<<" inserted\n";
 			nodes.push_back(X);
-		if(isfinite(Xbar.lb))
+		}
+		if(Xbar.lb<1.7e+308){
+			cout<<"Node "<<Xbar.serial<<" inserted\n";
 			nodes.push_back(Xbar);
+		}
+		if(done){
+			cout<<"Node "<<X.serial<<" contains an optimal tour\n";
+			break;
+		}
 		nodes.sort();
 	}
 
