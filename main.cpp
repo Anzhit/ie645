@@ -38,10 +38,17 @@ public:
     }
     Node branch1(int I,int  J){ // branch with arc (I,J)
         Node r = *this;
+        int l=C.size(),m=C.size();
+    	for(int i=0;i<C.size();i++)
+    		if(C[i][0]==I)
+    			l=i;
+    	for(int i=0;i<C.size();i++)
+    		if(C[0][i]==J)
+    			m=i;
     	for(int i=0;i<r.C.size();i++) {
-    		r.C[i].erase(r.C[i].begin()+J); // remove column 
+    		r.C[i].erase(r.C[i].begin()+m); // remove column 
     	}
-    	r.C.erase(r.C.begin()+I); // remove row
+    	r.C.erase(r.C.begin()+l); // remove row
     	r.in.push_back(make_pair(I,J));
     	//add to chain/s
     	int front=C.size(),back=C.size();
@@ -86,7 +93,7 @@ public:
     }
     Node branch2(int I,int  J){ //branch w/o arc (I,J)
     	Node r = *this;
-    	r.C[I][J]=DBL_MAX;
+    	r.invalidate(J,I);
     	r.lb+=reduce(r.C);
     	r.out.push_back(make_pair(I,J));
     	r.serial=++num;
@@ -197,8 +204,10 @@ list<Node> nodes; // list of sorted nodes (acc LB) to be explored
 		X.print();
 		Node Xbar=cur.branch2(arc.first,arc.second);
 		Xbar.print();
-		nodes.push_back(X);nodes.push_back(Xbar);
-
+		if(isfinite(X.lb))
+			nodes.push_back(X);
+		if(isfinite(Xbar.lb))
+			nodes.push_back(Xbar);
 		nodes.sort();
 	}
 
