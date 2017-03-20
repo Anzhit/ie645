@@ -73,7 +73,7 @@ public:
             t.push_back(I);
             t.push_back(J);
             r.chains.push_back(t);
-            if (N == 1)
+            if (N == 2)
                 done = true;
             else
                 r.invalidate(J, I);
@@ -219,7 +219,7 @@ int main()
         Node cur = nodes.front();
         nodes.pop_front();
         cout << "Popped Node: " << cur.serial << endl;
-        if (cur.C.size() == 1) {
+        if (cur.C.size() == 2) {
             cout << "Node " << cur.serial << " contains a complete optimal tour\n";
             break;
         }
