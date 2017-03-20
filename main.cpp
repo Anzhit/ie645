@@ -137,7 +137,7 @@ public:
     }
     void print()
     {
-        cout << "-----------------Node: " << serial << "------------------------\n";
+        cout << "-----------------Node# " << serial << "------------------------\n";
         cout << "Lower Bound: " << lb << endl;
         cout << "Residual Matrix:\n";
         mprint(C);
@@ -201,6 +201,7 @@ int main()
     cin >> n;
     N = n;
     Node init;
+    float ub=0;
     init.C.resize(n + 1);
     for (int i = 0; i <= n; i++) {
         init.C[i].resize(n + 1);
@@ -212,15 +213,25 @@ int main()
         for (int j = 0; j < n; j++)
             cin >> init.C[i + 1][j + 1];
     }
+     for (int i = 0; i < n; i++) {
+            ub+=init.C[i + 1][(i + 1)%n +1];
+    }   
+    cout<<ub;
     init.lb = reduce(init.C);
     nodes.push_back(init);
     init.print();
     while (true) {
+        if(nodes.size()>=17){
+            cout<<"Terminating due to >=17 nodes\n";
+            for(list<Node>::iterator i=nodes.begin();i!=nodes.end();i++)
+                cout<<"Node# "<<i->serial<<" LB:"<<i->lb<<endl;
+            break;
+        }
         Node cur = nodes.front();
         nodes.pop_front();
-        cout << "Popped Node: " << cur.serial << endl;
+        cout << "Popped Node# " << cur.serial << endl;
         if (cur.C.size() == 2) {
-            cout << "Node " << cur.serial << " contains a complete optimal tour\n";
+            cout << "Node# " << cur.serial << " contains a complete optimal tour\n";
             break;
         }
         pair<int, int> arc = cur.branchOn();
@@ -229,12 +240,12 @@ int main()
         X.print();
         Node Xbar = cur.branch2(arc.first, arc.second);
         Xbar.print();
-        if (X.lb < 1.7e+308) {
-            cout << "Node " << X.serial << " inserted\n";
+        if (X.lb <=ub) {
+            cout << "Node# " << X.serial << " inserted\n";
             nodes.push_back(X);
         }
-        if (Xbar.lb < 1.7e+308) {
-            cout << "Node " << Xbar.serial << " inserted\n";
+        if (Xbar.lb <=ub) {
+            cout << "Node# " << Xbar.serial << " inserted\n";
             nodes.push_back(Xbar);
         }
 
