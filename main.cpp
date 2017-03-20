@@ -132,8 +132,7 @@ public:
 		}	
     }
     void print(){
-
-    	cout<<"Serial Number: "<<serial<<endl;
+    	cout<<"-----------------Node: "<<serial<<"------------------------\n";
     	cout<<"Lower Bound: "<<lb<<endl;
     	cout<<"Residual Matrix:\n";
     	mprint(C);
@@ -152,7 +151,7 @@ public:
     			cout<<*j<<"->";
     		cout<<endl;
     	}
-    	cout<<endl;
+    	cout<<"---------------------------------------------\n";
     }
     bool operator<(const Node& y) { return lb < y.lb; }
 };
@@ -212,9 +211,13 @@ list<Node> nodes; // list of sorted nodes (acc LB) to be explored
 	while(true){
 		Node cur=nodes.front();
 				nodes.pop_front();
-		cout<<"Expanding Node: "<<cur.serial;
+	    cout<<"Popped Node: "<<cur.serial<<endl;
+		if(cur.C.size()==1){
+			cout<<"Node "<<cur.serial<<" contains a complete optimal tour\n";
+			break;
+		}
 		pair<int,int> arc=cur.branchOn();
-		cout<<" Using Arc: ("<<arc.first<<","<<arc.second<<")\n";
+		cout<<"Expanding Using Arc: ("<<arc.first<<","<<arc.second<<")\n";
 		Node X=cur.branch1(arc.first,arc.second);
 		X.print();
 		Node Xbar=cur.branch2(arc.first,arc.second);
@@ -227,10 +230,7 @@ list<Node> nodes; // list of sorted nodes (acc LB) to be explored
 			cout<<"Node "<<Xbar.serial<<" inserted\n";
 			nodes.push_back(Xbar);
 		}
-		if(done){
-			cout<<"Node "<<X.serial<<" contains an optimal tour\n";
-			break;
-		}
+
 		nodes.sort();
 	}
 
