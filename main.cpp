@@ -14,7 +14,7 @@ public:
     vector<pair<int, int> > in; // indexed list of in arcs
     vector<pair<int, int> > out; // indexed list of out arcs
     vector<list<int> > chains; // indexed list of directed chains
-    double theta(int I, int J)
+    double theta(int I, int J) // find the theta value of C(i,j)
     {
         double ret = 0;
         double min = DBL_MAX;
@@ -28,7 +28,7 @@ public:
                 min = C[i][J];
         return ret + min;
     }
-    pair<int, int> branchOn()
+    pair<int, int> branchOn() // return the arc to branch on
     {
         double max = DBL_MIN;
         pair<int, int> ret;
@@ -127,7 +127,7 @@ public:
         if (l < C.size() && m < C.size())
             C[l][m] = DBL_MAX;
     }
-    void invalidChain(list<int> c)
+    void invalidChain(list<int> c) // invalidate all back edges in the chain to avoid cycles in the future
     {
         for (list<int>::const_iterator i = c.end(); i != c.begin();) {
             --i;
@@ -158,7 +158,7 @@ public:
         }
         cout << "---------------------------------------------\n";
     }
-    bool operator<(const Node& y) { return lb < y.lb; }
+    bool operator<(const Node& y) { return lb < y.lb; } // for sorting nodes 
 };
 double reduce(vector<vector<double> >& C)
 {
@@ -216,7 +216,7 @@ int main()
      for (int i = 0; i < n; i++) {
             ub+=init.C[i + 1][(i + 1)%n +1];
     }   
-    cout<<ub;
+    cout<<"Upper Bound: "<<ub<<endl;
     init.lb = reduce(init.C);
     nodes.push_back(init);
     init.print();
@@ -231,7 +231,7 @@ int main()
         nodes.pop_front();
         cout << "Popped Node# " << cur.serial << endl;
         if (cur.C.size() == 2) {
-            cout << "Node# " << cur.serial << " contains a complete optimal tour\n";
+            cout << "Node# " << cur.serial << " contains a complete optimal tour of cost "<<cur.lb<<endl;
             break;
         }
         pair<int, int> arc = cur.branchOn();
